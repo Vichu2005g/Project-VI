@@ -2,5 +2,6 @@ build/
 *.o
 *.exe
 *.out
-*.vscode/
-*.idea/
+.vscode/
+.vs/
+.idea/
