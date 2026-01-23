@@ -1,7 +1,32 @@
+# Build directories
 build/
-*.o
-*.exe
-*.out
-.vscode/
+out/
+*_build/
+ALL_BUILD.dir/
+INSTALL.dir/
+PACKAGE.dir/
+ZERO_CHECK.dir/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+_deps/
+
+# Visual Studio
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 .vs/
-.idea/
+x64/
+Debug/
+Release/
+MinSizeRel/
+RelWithDebInfo/
+
+# OS junk
+.DS_Store
+Thumbs.db
