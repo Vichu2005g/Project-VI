@@ -25,6 +25,20 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Crow)
 
-add_executable(Project-VI src/main.cpp Models/Car.cpp)
-target_include_directories(Project-VI PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Models)
-target_link_libraries(Project-VI PRIVATE Crow::Crow)
+# Fetch SQLite3
+FetchContent_Declare(
+  sqlite3
+  URL https://www.sqlite.org/2024/sqlite-amalgamation-3450100.zip
+)
+FetchContent_MakeAvailable(sqlite3)
+
+# Create SQLite3 library
+add_library(sqlite3_lib STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+target_include_directories(sqlite3_lib PUBLIC ${sqlite3_SOURCE_DIR})
+
+add_executable(Project-VI src/main.cpp Models/Car.cpp Database/CarRepository.cpp)
+target_include_directories(Project-VI PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Models
+    ${CMAKE_CURRENT_SOURCE_DIR}/Database
+)
+target_link_libraries(Project-VI PRIVATE Crow::Crow sqlite3_lib)

@@ -37,8 +37,16 @@ void Car::setYear(int year) {
     this->year = year;
 }
 
+int Car::getVinId() const {
+    return vinId;
+}
+
 void Car::setVinId(int vinId) {
     this->vinId = vinId;
+}
+
+int Car::getMileage() const {
+    return mileage;
 }
 
 void Car::setMileage(int mileage) {
