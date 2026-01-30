@@ -6,6 +6,10 @@ public:
     Car();
     Car(std::string make, std::string model, int year);
 
+    int carId;
+    int getCarId() const;
+    void setCarId(int carId);
+
     std::string getMake() const;
     void setMake(const std::string& make);
 

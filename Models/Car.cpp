@@ -5,6 +5,14 @@ Car::Car() : year(0) {}
 Car::Car(std::string make, std::string model, int year)
     : make(std::move(make)), model(std::move(model)), year(year) {}
 
+int Car::getCarId() const {
+    return carId;
+}
+
+void Car::setCarId(int carId) {
+    this->carId = carId;
+}
+
 std::string Car::getMake() const {
     return make;
 }

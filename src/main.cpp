@@ -1,9 +1,12 @@
 #include "crow.h"
+#include "Car.h"
 
 int main() {
     crow::SimpleApp app;
+
     CROW_ROUTE(app, "/")([](){
-        return "Hello World!";
+        Car car("Toyota", "Corolla", 2020);
+        return "Hello World! I have a " + car.getMake() + " " + car.getModel();
     }); 
 
     CROW_ROUTE(app, "/healthCheck")([](){
