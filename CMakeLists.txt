@@ -25,5 +25,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Crow)
 
-add_executable(Project-VI src/main.cpp)
+add_executable(Project-VI src/main.cpp Models/Car.cpp)
+target_include_directories(Project-VI PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Models)
 target_link_libraries(Project-VI PRIVATE Crow::Crow)
