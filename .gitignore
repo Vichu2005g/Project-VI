@@ -6,6 +6,7 @@ ALL_BUILD.dir/
 INSTALL.dir/
 PACKAGE.dir/
 ZERO_CHECK.dir/
+/build/
 
 # CMake
 CMakeCache.txt
