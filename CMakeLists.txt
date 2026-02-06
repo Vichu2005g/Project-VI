@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-# Fetch Asio (Standalone)
+# Fetch Asio 
 FetchContent_Declare(
   asio
   GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
@@ -25,6 +25,24 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Crow)
 
-add_executable(Project-VI src/main.cpp Models/Car.cpp)
-target_include_directories(Project-VI PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Models)
-target_link_libraries(Project-VI PRIVATE Crow::Crow)
+# Find SQLite3
+find_package(SQLite3 REQUIRED)
+
+# adding the soruce files
+add_executable(Project-VI 
+    src/main.cpp 
+    Models/Car.cpp
+    src/database/database.cpp
+)
+
+# Include the directories
+target_include_directories(Project-VI PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Models
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/database
+)
+
+# Linkign libraries
+target_link_libraries(Project-VI PRIVATE 
+    Crow::Crow
+    SQLite::SQLite3
+)
