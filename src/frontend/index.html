@@ -6,5 +6,78 @@
     <title>Car Inventory Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 Car Inventory System</h1>
+            <p>Manage your car inventory with ease</p>
+        </header>
 
+        <!-- Add/Edit Car Form -->
+        <section class="form-section">
+            <h2 id="form-title">Add New Car</h2>
+            <form id="car-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="make">Make *</label>
+                        <input type="text" id="make" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Model *</label>
+                        <input type="text" id="model" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="year">Year *</label>
+                        <input type="number" id="year" min="1886" max="2027" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price ($) *</label>
+                        <input type="number" id="price" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mileage">Mileage (km) *</label>
+                        <input type="number" id="mileage" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="vin">VIN (Vehicle Identification Number)</label>
+                    <input type="text" id="vin" maxlength="17">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Save Car</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Cars List -->
+        <section class="list-section">
+            <div class="list-header">
+                <h2>Car Inventory</h2>
+                <button class="btn btn-refresh" id="refresh-btn">🔄 Refresh</button>
+            </div>
+            
+            <div id="loading" class="loading">Loading cars...</div>
+            <div id="error-message" class="error-message"></div>
+            
+            <div id="cars-container" class="cars-grid">
+                <!-- Cars will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
 </html>
