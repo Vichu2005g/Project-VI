@@ -4,27 +4,29 @@ project(Project-VI)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
+# Include crow directory
+include_directories(${CMAKE_SOURCE_DIR}/third_party/crow/include)
 
-# Fetch Asio (Standalone)
-FetchContent_Declare(
-  asio
-  GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
-  GIT_TAG asio-1-30-2
+# Add all source files
+add_executable(Project-VI 
+    src/main.cpp 
+    Models/Car.cpp
+    src/database/database.cpp
+    src/database/sqlite3.c
 )
-FetchContent_MakeAvailable(asio)
 
-# Configure Crow to use Asio
-set(CROW_USE_BOOST OFF CACHE BOOL "" FORCE)
-set(ASIO_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include")
-
-FetchContent_Declare(
-  Crow
-  GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
-  GIT_TAG master
+# Include directories for headers
+target_include_directories(Project-VI PRIVATE 
+    ${CMAKE_SOURCE_DIR}/third_party/crow/include
+    ${CMAKE_SOURCE_DIR}/third_party/asio-1.36.0/include
+    ${CMAKE_SOURCE_DIR}/Models
+    ${CMAKE_SOURCE_DIR}/src/database
+    ${CMAKE_SOURCE_DIR}/src/Routes
+    ${CMAKE_SOURCE_DIR}/src/utils   
 )
-FetchContent_MakeAvailable(Crow)
 
-add_executable(Project-VI src/main.cpp Models/Car.cpp)
-target_include_directories(Project-VI PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Models)
-target_link_libraries(Project-VI PRIVATE Crow::Crow)
+
+# Windows: Link winsock for networking
+if(WIN32)
+    target_link_libraries(Project-VI PRIVATE ws2_32)
+endif()
