@@ -18,7 +18,7 @@ public:
     bool updateCar(int id, const Car& car);
     bool deleteCar(int id);
     Car getCarById(int id, bool& found);
-    std::vector<Car> getAllCars();
+    std::vector<Car> getAllCars(int limit = -1);
 
     // Utility methods
     bool carExists(int id);

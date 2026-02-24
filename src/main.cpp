@@ -35,15 +35,6 @@ int main() {
     CarRoutes::setupRoutes(app, db);
     std::cout << "API routes configured!" << std::endl;
     
-    // Health check endpoint
-    CROW_ROUTE(app, "/healthCheck")
-    ([](){
-        crow::json::wvalue response;
-        response["status"] = "OK";
-        response["message"] = "Car Inventory API is running";
-        return crow::response(200, response);
-    });
-    
 CROW_ROUTE(app, "/")([](){
     std::string html = readFile("frontend/index.html");
     if (html.empty()) return crow::response(404, "Frontend not found");
@@ -65,6 +56,46 @@ CROW_ROUTE(app, "/style.css")([](){
     if (css.empty()) return crow::response(404, "CSS not found");
     auto res = crow::response(css);
     res.add_header("Content-Type", "text/css");
+    return res;
+});
+
+CROW_ROUTE(app, "/add-car.html")([](){
+    std::string html = readFile("frontend/add-car.html");
+    if (html.empty()) return crow::response(404, "Page not found");
+    auto res = crow::response(html);
+    res.add_header("Content-Type", "text/html");
+    return res;
+});
+
+CROW_ROUTE(app, "/stats.html")([](){
+    std::string html = readFile("frontend/stats.html");
+    if (html.empty()) return crow::response(404, "Page not found");
+    auto res = crow::response(html);
+    res.add_header("Content-Type", "text/html");
+    return res;
+});
+
+CROW_ROUTE(app, "/home.js")([](){
+    std::string js = readFile("frontend/home.js");
+    if (js.empty()) return crow::response(404, "JavaScript not found");
+    auto res = crow::response(js);
+    res.add_header("Content-Type", "application/javascript");
+    return res;
+});
+
+CROW_ROUTE(app, "/add-car.js")([](){
+    std::string js = readFile("frontend/add-car.js");
+    if (js.empty()) return crow::response(404, "JavaScript not found");
+    auto res = crow::response(js);
+    res.add_header("Content-Type", "application/javascript");
+    return res;
+});
+
+CROW_ROUTE(app, "/stats.js")([](){
+    std::string js = readFile("frontend/stats.js");
+    if (js.empty()) return crow::response(404, "JavaScript not found");
+    auto res = crow::response(js);
+    res.add_header("Content-Type", "application/javascript");
     return res;
 });
 

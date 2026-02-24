@@ -29,8 +29,13 @@ public:
 
         // GET all
         CROW_ROUTE(app, "/api/cars").methods("GET"_method)
-        ([&db]() {
-            std::vector<Car> cars = db.getAllCars();
+        ([&db](const crow::request& req) {
+            int limit = -1;
+            auto limitParam = req.url_params.get("limit");
+            if (limitParam) {
+                try { limit = std::stoi(limitParam); } catch (...) {}
+            }
+            std::vector<Car> cars = db.getAllCars(limit);
             crow::json::wvalue response = crow::json::wvalue::list();
 
             for (size_t i = 0; i < cars.size(); i++) {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory &amp; Stats - Car Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Inventory &amp; Stats</h1>
+        <nav class="page-nav">
+            <a href="/" class="nav-back">&#8592; Back to Home</a>
+            <a href="add-car.html" class="btn btn-primary btn-sm">+ Add Car</a>
+        </nav>
+    </header>
+
+    <!-- Stats Dashboard -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">&#8212;</div>
+                <div class="stat-label">Total Cars</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-avg-price">&#8212;</div>
+                <div class="stat-label">Avg. Price</div>
+            </div>
+            <div class="stat-card stat-card-wide">
+                <div class="stat-label" style="margin-bottom:12px; font-size:1rem; font-weight:600;">Top 5 Models</div>
+                <ol id="stat-top-models" class="top-models-list"></ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter & Sort -->
+    <section class="filter-section">
+        <h2>Filter &amp; Sort Listings</h2>
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label for="filter-make">Make:</label>
+                <select id="filter-make"><option value="">All Makes</option></select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-model">Model:</label>
+                <select id="filter-model"><option value="">All Models</option></select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-color">Color:</label>
+                <select id="filter-color"><option value="">All Colors</option></select>
+            </div>
+            <div class="filter-group">
+                <label for="sort-by">Sort By:</label>
+                <select id="sort-by">
+                    <option value="">None</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="year-desc">Year: Newest First</option>
+                    <option value="year-asc">Year: Oldest First</option>
+                    <option value="mileage-asc">Mileage: Low to High</option>
+                    <option value="mileage-desc">Mileage: High to Low</option>
+                </select>
+            </div>
+            <button class="btn btn-refresh" id="clear-filters">Clear Filters</button>
+        </div>
+    </section>
+
+    <!-- Car Listings -->
+    <section class="list-section">
+        <div class="list-header">
+            <h2>Car Inventory</h2>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span id="cars-count" class="cars-count-label"></span>
+                <button class="btn btn-refresh" id="refresh-btn">Refresh</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Loading cars...</div>
+        <div id="error-message" class="error-message"></div>
+
+        <div id="cars-container" class="cars-grid"></div>
+    </section>
+</div>
+
+<!-- Car Detail Popup -->
+<div id="car-popup" class="modal">
+    <div class="modal-content">
+        <span class="close" id="popup-close">&times;</span>
+        <div id="popup-body"></div>
+    </div>
+</div>
+
+<script src="stats.js"></script>
+</body>
+</html>

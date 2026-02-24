@@ -213,12 +213,14 @@ Car Database::getCarById(int id, bool& found) {
 }
 
 // Get all
-std::vector<Car> Database::getAllCars() {
+std::vector<Car> Database::getAllCars(int limit) {
     std::vector<Car> cars;
 
     std::string sql =
         "SELECT id, make, model, year, price, mileage_km, color, vin, image_data_url, created_at, updated_at "
-        "FROM cars ORDER BY id;";
+        "FROM cars ORDER BY updated_at DESC";
+    if (limit > 0) sql += " LIMIT " + std::to_string(limit);
+    sql += ";";
 
     sqlite3_stmt* stmt = nullptr;
     int result = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
