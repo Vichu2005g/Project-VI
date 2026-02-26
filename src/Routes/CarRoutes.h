@@ -47,7 +47,7 @@ public:
                 response[i]["mileageKm"] = cars[i].getMileage();
                 response[i]["color"] = cars[i].getColor();
                 response[i]["vin"] = cars[i].getVin();
-                response[i]["imageDataUrl"] = cars[i].getImageDataUrl(); 
+                // Exclude imageDataUrl from list - fetch via GET /api/cars/{id} for detail view
                 response[i]["createdAt"] = cars[i].getCreatedAt();
                 response[i]["updatedAt"] = cars[i].getUpdatedAt();
             }

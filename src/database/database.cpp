@@ -28,6 +28,14 @@ bool Database::initialize() {
 
     std::cout << "Database opened successfully: " << dbPath << std::endl;
 
+    // Enable WAL mode for better read performance and concurrent access
+    char* errMsg = nullptr;
+    result = sqlite3_exec(db, "PRAGMA journal_mode=WAL;", nullptr, nullptr, &errMsg);
+    if (result != SQLITE_OK) {
+        std::cerr << "WAL mode warning: " << (errMsg ? errMsg : "unknown") << std::endl;
+        if (errMsg) sqlite3_free(errMsg);
+    }
+
     std::string createTableSQL = R"(
         CREATE TABLE IF NOT EXISTS cars (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,6 +53,7 @@ bool Database::initialize() {
 
         CREATE INDEX IF NOT EXISTS idx_cars_make_model ON cars(make, model);
         CREATE INDEX IF NOT EXISTS idx_cars_year ON cars(year);
+        CREATE INDEX IF NOT EXISTS idx_cars_updated_at ON cars(updated_at DESC);
         CREATE UNIQUE INDEX IF NOT EXISTS idx_cars_vin ON cars(vin) WHERE vin IS NOT NULL;
     )";
 
