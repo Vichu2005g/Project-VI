@@ -1,3 +1,8 @@
+/**
+ * @file database.cpp
+ * @brief Implementation of the Database class for SQLite3 interactions.
+ */
+
 #include "database.h"
 #include <iostream>
 #include <ctime>

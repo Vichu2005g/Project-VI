@@ -1,3 +1,8 @@
+/**
+ * @file Car.cpp
+ * @brief Implementation of the Car class methods.
+ */
+
 #include "Car.h"
 
 // Default constructor

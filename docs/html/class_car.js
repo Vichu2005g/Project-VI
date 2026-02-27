@@ -1,0 +1,27 @@
+var class_car =
+[
+    [ "Car", "class_car.html#a1c803f7c5038d3e31b368b0d0a35493c", null ],
+    [ "Car", "class_car.html#a1e76686023801a42fac5c813fb1fbd34", null ],
+    [ "getCarId", "class_car.html#a2a41b4ed9007c88c781274145027a535", null ],
+    [ "getColor", "class_car.html#a0ddfc962565d1cd236894877f9f7212a", null ],
+    [ "getCreatedAt", "class_car.html#a7b9626425a0e8ae3354333bd6f49139c", null ],
+    [ "getImageDataUrl", "class_car.html#a975c7a788d8395c2ac71f46afa84524c", null ],
+    [ "getMake", "class_car.html#acacd89a092817eca75267da050f5af16", null ],
+    [ "getMileage", "class_car.html#ae890aa34cb4f15ed1cb430be36732218", null ],
+    [ "getModel", "class_car.html#ae75f4386fd299591ad961d1f90529d99", null ],
+    [ "getPrice", "class_car.html#a986bd60af05950184530522375f2b685", null ],
+    [ "getUpdatedAt", "class_car.html#a11439e5e0691464398247fb53dd639e1", null ],
+    [ "getVin", "class_car.html#a500429534963b5e03100a7a5cfb6994c", null ],
+    [ "getYear", "class_car.html#a5dae61d912e1320cb6ca9e79eea9c4f7", null ],
+    [ "setCarId", "class_car.html#aa145eb03026c45e6ea58f7afb715e026", null ],
+    [ "setColor", "class_car.html#aa18e40d3411c09cf1a2586f54f295495", null ],
+    [ "setCreatedAt", "class_car.html#a733aabdb3885b1742aa1c910522d0692", null ],
+    [ "setImageDataUrl", "class_car.html#a7780c2aead544d4fd9357ceb80c0e4b8", null ],
+    [ "setMake", "class_car.html#ab54663120c088e70cbbf57c24942bd12", null ],
+    [ "setMileage", "class_car.html#af89a55408f3420c5543aa20411a1216e", null ],
+    [ "setModel", "class_car.html#a42ccef04b7a8f7bd972e67c4a8fcaf03", null ],
+    [ "setPrice", "class_car.html#aa909895b9c73c18c0dc95e5e025fe4de", null ],
+    [ "setUpdatedAt", "class_car.html#a1e9c3c7a03386790004c08f2dee603fe", null ],
+    [ "setVin", "class_car.html#afd04d56db0cb00aaac3a172a2f8e3c18", null ],
+    [ "setYear", "class_car.html#acd87a36ccc6182cce8df97b4d6d020fd", null ]
+];

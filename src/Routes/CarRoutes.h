@@ -1,3 +1,8 @@
+/**
+ * @file CarRoutes.h
+ * @brief RESTful API routing configuration for Car Inventory.
+ */
+
 #pragma once
 #include "crow.h"
 #include "database.h"
@@ -5,29 +10,52 @@
 #include <vector>
 #include <string>
 #include "StringUtils.h"
+
+/**
+ * @class CarRoutes
+ * @brief Static utility class to configure Crow API routes.
+ * 
+ * This class encapsulates all RESTful endpoints for the Car Inventory system,
+ * including GET, POST, PUT, PATCH, DELETE, and OPTIONS methods.
+ */
 class CarRoutes {
 public:
+    /**
+     * @brief Configures all API routes for the given Crow application.
+     * 
+     * @param app The Crow application instance.
+     * @param db Reference to the initialized Database object.
+     */
     static void setupRoutes(crow::SimpleApp& app, Database& db) {
 
+
+        /** @brief Helper to safely extract a string from JSON body. */
         auto getString = [](const crow::json::rvalue& body, const std::string& key) -> std::string {
             if (!body.has(key)) return "";
             if (body[key].t() == crow::json::type::String) return body[key].s();
             return "";
         };
 
+        /** @brief Helper to safely extract an integer from JSON body. */
         auto getInt = [](const crow::json::rvalue& body, const std::string& key, int def = 0) -> int {
             if (!body.has(key)) return def;
             if (body[key].t() == crow::json::type::Number) return body[key].i();
             return def;
         };
 
+        /** @brief Helper to safely extract a double from JSON body. */
         auto getDouble = [](const crow::json::rvalue& body, const std::string& key, double def = 0.0) -> double {
             if (!body.has(key)) return def;
             if (body[key].t() == crow::json::type::Number) return body[key].d();
             return def;
         };
 
-        // GET all
+        /**
+         * @route GET /api/cars
+         * @brief Retrieves a list of all car listings.
+         * @query limit Optional number of records to return.
+         * @return 200 OK with JSON array of cars.
+         */
         CROW_ROUTE(app, "/api/cars").methods("GET"_method)
         ([&db](const crow::request& req) {
             int limit = -1;
@@ -54,7 +82,12 @@ public:
             return crow::response(200, response);
         });
 
-        // GET by id
+        /**
+         * @route GET /api/cars/<id>
+         * @brief Retrieves details for a specific car by ID.
+         * @param id The primary key of the car.
+         * @return 200 OK with car details or 404 Not Found.
+         */
         CROW_ROUTE(app, "/api/cars/<int>").methods("GET"_method)
         ([&db](int id) {
             bool found = false;
@@ -82,7 +115,12 @@ public:
             return crow::response(200, response);
         });
 
-        // POST create
+        /**
+         * @route POST /api/cars
+         * @brief Creates a new car listing.
+         * @body JSON object containing car details (make, model, year, price, mileageKm).
+         * @return 201 Created with new car data or 400/500 on error.
+         */
         CROW_ROUTE(app, "/api/cars").methods("POST"_method)
         ([&db, getString, getInt, getDouble](const crow::request& req) {
             auto body = crow::json::load(req.body);
@@ -187,8 +225,11 @@ CROW_ROUTE(app, "/api/cars/<int>").methods("PATCH"_method)
     return crow::response(200, response);
 });
 
-// OPTIONS 
-CROW_ROUTE(app, "/api/cars").methods("OPTIONS"_method)
+        /**
+         * @route OPTIONS /api/cars
+         * @brief Returns allowed HTTP methods for the cars collection.
+         */
+        CROW_ROUTE(app, "/api/cars").methods("OPTIONS"_method)
 ([]() {
     auto res = crow::response(204);
     res.add_header("Allow", "GET, POST, OPTIONS");
@@ -206,7 +247,13 @@ CROW_ROUTE(app, "/api/cars/<int>").methods("OPTIONS"_method)
     return res;
 });
 
-        // PUT update
+        /**
+         * @route PUT /api/cars/<id>
+         * @brief Fully replaces an existing car listing.
+         * @param id The primary key of the car.
+         * @body JSON object containing the full car data.
+         * @return 200 OK with updated car data.
+         */
        CROW_ROUTE(app, "/api/cars/<int>").methods("PUT"_method)
         ([&db, getString, getInt, getDouble](const crow::request& req, int id) {
             if (!db.carExists(id)) {
@@ -264,7 +311,12 @@ CROW_ROUTE(app, "/api/cars/<int>").methods("OPTIONS"_method)
             return crow::response(200, response);
         });
 
-        // DELETE
+        /**
+         * @route DELETE /api/cars/<id>
+         * @brief Deletes a car listing.
+         * @param id The primary key of the car.
+         * @return 204 No Content or 404/500 on error.
+         */
         CROW_ROUTE(app, "/api/cars/<int>").methods("DELETE"_method)
         ([&db](int id) {
             if (!db.carExists(id)) {
