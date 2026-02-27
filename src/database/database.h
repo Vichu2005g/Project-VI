@@ -6,11 +6,9 @@
 
 class Database {
 public:
-    // Constructor and Destructor
     Database(const std::string& dbPath);
     ~Database();
 
-    // Initialize the  database and create the tables...well a single table so far
     bool initialize();
 
     // CRUD Operations
@@ -18,9 +16,16 @@ public:
     bool updateCar(int id, const Car& car);
     bool deleteCar(int id);
     Car getCarById(int id, bool& found);
-    std::vector<Car> getAllCars(int limit = -1);
 
-    // Utility methods
+    // Updated — now has offset parameter
+    std::vector<Car> getAllCars(int limit = -1, int offset = 0);
+
+    // NEW — excludes image data for list views (fast)
+    std::vector<Car> getAllCarsSummary(int limit = 20, int offset = 0);
+
+    // NEW — total count for pagination metadata
+    int getTotalCarCount();
+
     bool carExists(int id);
     bool vinExists(const std::string& vin);
     void close();
@@ -28,7 +33,5 @@ public:
 private:
     sqlite3* db;
     std::string dbPath;
-    
-    // Helper function to run SQL
     bool executeSQL(const std::string& sql);
 };

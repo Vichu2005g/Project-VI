@@ -17,7 +17,7 @@ double Car::getPrice() const { return price; }
 int Car::getMileage() const { return mileage; }
 std::string Car::getColor() const { return color; }
 std::string Car::getVin() const { return vin; }
-std::string Car::getImageDataUrl() const { return imageDataUrl; } // ✅ NEW
+std::string Car::getImageDataUrl() const { return imageDataUrl; }
 std::string Car::getCreatedAt() const { return createdAt; }
 std::string Car::getUpdatedAt() const { return updatedAt; }
 
@@ -30,6 +30,6 @@ void Car::setPrice(double price) { this->price = price; }
 void Car::setMileage(int mileage) { this->mileage = mileage; }
 void Car::setColor(const std::string& color) { this->color = color; }
 void Car::setVin(const std::string& vin) { this->vin = vin; }
-void Car::setImageDataUrl(const std::string& imageDataUrl) { this->imageDataUrl = imageDataUrl; } // ✅ NEW
+void Car::setImageDataUrl(const std::string& imageDataUrl) { this->imageDataUrl = imageDataUrl; } 
 void Car::setCreatedAt(const std::string& createdAt) { this->createdAt = createdAt; }
 void Car::setUpdatedAt(const std::string& updatedAt) { this->updatedAt = updatedAt; }

@@ -29,7 +29,68 @@
         <div id="cars-container" class="cars-grid"></div>
     </section>
 </div>
+<!-- Quick Edit Modal PATCH -->
+<div id="quick-edit-modal" style="display:none; position:fixed; z-index:2000; 
+     left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6);">
+    <div style="background:white; margin:10% auto; padding:30px; 
+                border-radius:10px; width:90%; max-width:400px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        
+        <h2 style="color:#333; margin-bottom:5px;">Quick Edit</h2>
+        <p style="color:#888; font-size:0.9rem; margin-bottom:20px;">
+            Update only what you need 
+        </p>
 
+        <input type="hidden" id="patch-car-id">
+
+        <div style="margin-bottom:15px;">
+            <label style="display:block; font-weight:600; 
+                          margin-bottom:5px; color:#555;">
+                Price ($)
+            </label>
+            <input type="number" id="patch-price" min="0" step="0.01"
+                   style="width:100%; padding:10px; border:2px solid #ddd; 
+                          border-radius:5px; font-size:1rem;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:600; 
+                          margin-bottom:5px; color:#555;">
+                Color
+            </label>
+            <input type="text" id="patch-color" placeholder="e.g. Red"
+                   style="width:100%; padding:10px; border:2px solid #ddd; 
+                          border-radius:5px; font-size:1rem;">
+        </div>
+
+        
+        <div style="background:#f8f9fa; border-radius:5px; padding:12px; 
+                    margin-bottom:20px; border-left:4px solid #667eea;">
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px; 
+                      font-weight:600;">
+                PATCH request preview:
+            </p>
+            <code id="patch-preview" style="font-size:0.8rem; color:#c0392b;">
+                { }
+            </code>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <button onclick="submitPatch()" 
+                    style="flex:1; padding:12px; background:#667eea; 
+                           color:white; border:none; border-radius:5px; 
+                           font-size:1rem; font-weight:600; cursor:pointer;">
+                Apply Changes
+            </button>
+            <button onclick="closeQuickEdit()"
+                    style="flex:1; padding:12px; background:#6c757d; 
+                           color:white; border:none; border-radius:5px; 
+                           font-size:1rem; cursor:pointer;">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 <script src="home.js"></script>
 </body>
 </html>

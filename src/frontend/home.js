@@ -16,7 +16,8 @@ async function loadCars() {
     try {
         const response = await fetch(`${API_URL}?limit=5`);
         if (!response.ok) throw new Error('Failed to load cars');
-        const cars = await response.json();
+        const data = await response.json();
+        const cars = data.cars || data; 
         displayCars(cars);
     } catch (error) {
         showError('Error loading cars: ' + error.message);
@@ -45,6 +46,7 @@ function displayCars(cars) {
             </div>
             <div class="car-actions" onclick="event.stopPropagation()">
                 <button class="btn btn-edit" onclick="window.location.href='add-car.html?id=${car.id}'">Edit</button>
+                <button class="btn btn-patch" onclick="openQuickEdit(event, ${car.id}, ${car.price}, '${car.color}')">Quick Edit</button>
                 <button class="btn btn-delete" onclick="deleteCar(${car.id})">Delete</button>
             </div>
         </div>
@@ -86,3 +88,69 @@ function showSuccess(message) {
 function hideMessage() {
     document.getElementById('error-message').style.display = 'none';
 }
+
+function openQuickEdit(event, carId, currentPrice, currentColor) {
+    event.stopPropagation();
+    document.getElementById('patch-car-id').value  = carId;
+    document.getElementById('patch-price').value   = currentPrice;
+    document.getElementById('patch-color').value   = currentColor;
+    updatePatchPreview();
+    document.getElementById('quick-edit-modal').style.display = 'block';
+    document.getElementById('patch-price').addEventListener(
+        'input', updatePatchPreview
+    );
+    document.getElementById('patch-color').addEventListener(
+        'input', updatePatchPreview
+    );
+}
+
+function updatePatchPreview() {
+    const price = document.getElementById('patch-price').value;
+    const color = document.getElementById('patch-color').value;
+    document.getElementById('patch-preview').textContent =
+        `{ "price": ${price}, "color": "${color}" }`;
+}
+
+function closeQuickEdit() {
+    document.getElementById('quick-edit-modal').style.display = 'none';
+}
+
+async function submitPatch() {
+    const id    = document.getElementById('patch-car-id').value;
+    const price = parseFloat(document.getElementById('patch-price').value);
+    const color = document.getElementById('patch-color').value.trim();
+
+    if (!price || price < 0) { alert('Please enter a valid price'); return; }
+    if (!color) { alert('Please enter a color'); return; }
+
+    const patchData = { price: price, color: color };
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(patchData)
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to patch car');
+        }
+
+        const updated = await response.json();
+        closeQuickEdit();
+        showSuccess(
+            `Quick Edit applied — Price: $${Number(updated.price)
+            .toLocaleString()}, Color: ${updated.color}`
+        );
+        await loadCars(); 
+
+    } catch (error) {
+        alert('Error applying quick edit: ' + error.message);
+    }
+}
+
+document.getElementById('quick-edit-modal')
+    .addEventListener('click', function(e) {
+        if (e.target === this) closeQuickEdit();
+    });

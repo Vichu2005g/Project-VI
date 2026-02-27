@@ -347,6 +347,17 @@ a.btn-primary, a.btn-stats {
     padding: 8px 16px;
     font-size: 0.9rem;
 }
+.btn-patch {
+    background: #17a2b8;
+    color: white;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.btn-patch:hover {
+    background: #138496;
+    transform: translateY(-2px);
+}
 
 .btn-delete:hover {
     background: #c82333;
