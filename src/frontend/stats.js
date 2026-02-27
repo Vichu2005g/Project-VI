@@ -1,20 +1,31 @@
 const API_URL = 'http://localhost:8080/api/cars';
+const STATS_URL = 'http://localhost:8080/api/stats';
 let allCars = [];
 const DISPLAY_LIMIT = 10;
+const FILTER_DEBOUNCE_MS = 150;
 
 function escapeHtml(text) {
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return text ? text.replace(/[&<>"']/g, m => map[m]) : '';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    loadCars();
+function debounce(fn, ms) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), ms);
+    };
+}
 
-    document.getElementById('refresh-btn').addEventListener('click', loadCars);
-    document.getElementById('filter-make').addEventListener('change', applyFiltersAndSort);
-    document.getElementById('filter-model').addEventListener('change', applyFiltersAndSort);
-    document.getElementById('filter-color').addEventListener('change', applyFiltersAndSort);
-    document.getElementById('sort-by').addEventListener('change', applyFiltersAndSort);
+document.addEventListener('DOMContentLoaded', function () {
+    loadData();
+
+    document.getElementById('refresh-btn').addEventListener('click', loadData);
+    const debouncedApply = debounce(applyFiltersAndSort, FILTER_DEBOUNCE_MS);
+    document.getElementById('filter-make').addEventListener('change', debouncedApply);
+    document.getElementById('filter-model').addEventListener('change', debouncedApply);
+    document.getElementById('filter-color').addEventListener('change', debouncedApply);
+    document.getElementById('sort-by').addEventListener('change', debouncedApply);
     document.getElementById('clear-filters').addEventListener('click', clearFilters);
 
     const popup = document.getElementById('car-popup');
@@ -23,52 +34,53 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') popup.style.display = 'none'; });
 });
 
-async function loadCars() {
+async function loadData() {
     showLoading(true);
     hideMessage();
     try {
-        const response = await fetch(API_URL);
-        if (!response.ok) throw new Error('Failed to load cars');
-        allCars = await response.json();
+        const [statsRes, carsRes] = await Promise.all([
+            fetch(STATS_URL),
+            fetch(API_URL)
+        ]);
+        if (!statsRes.ok) throw new Error('Failed to load stats');
+        if (!carsRes.ok) throw new Error('Failed to load cars');
+
+        const [stats, cars] = await Promise.all([statsRes.json(), carsRes.json()]);
+        allCars = cars;
+        renderStats(stats);
         populateFilterOptions(allCars);
-        computeStats(allCars);
         applyFiltersAndSort();
     } catch (error) {
-        showError('Error loading cars: ' + error.message);
+        showError('Error loading data: ' + error.message);
         allCars = [];
+        renderStats({ total: 0, avgPrice: 0, topModels: [] });
     } finally {
         showLoading(false);
     }
 }
 
-function computeStats(cars) {
-    document.getElementById('stat-total').textContent = cars.length;
+function renderStats(stats) {
+    document.getElementById('stat-total').textContent = stats.total ?? 0;
 
-    if (cars.length > 0) {
-        const avg = cars.reduce((sum, c) => sum + Number(c.price), 0) / cars.length;
-        document.getElementById('stat-avg-price').textContent = '$' + Math.round(avg).toLocaleString();
+    if (stats.total > 0 && typeof stats.avgPrice === 'number' && !isNaN(stats.avgPrice)) {
+        document.getElementById('stat-avg-price').textContent = '$' + Math.round(stats.avgPrice).toLocaleString();
     } else {
         document.getElementById('stat-avg-price').textContent = 'N/A';
     }
 
-    const modelCounts = {};
-    cars.forEach(c => {
-        if (c.model) modelCounts[c.model] = (modelCounts[c.model] || 0) + 1;
-    });
-    const top5 = Object.entries(modelCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
+    const topModels = stats.topModels || [];
     const list = document.getElementById('stat-top-models');
-    if (top5.length === 0) {
+    if (topModels.length === 0) {
         list.innerHTML = '<li class="top-model-item" style="color:#999;">No data yet</li>';
     } else {
-        list.innerHTML = top5.map(([model, count]) =>
-            `<li class="top-model-item">
+        list.innerHTML = topModels.map(item => {
+            const model = item.model || '';
+            const count = item.count ?? 0;
+            return `<li class="top-model-item">
                 <span class="top-model-name">${escapeHtml(model)}</span>
                 <span class="top-model-count">${count}</span>
-            </li>`
-        ).join('');
+            </li>`;
+        }).join('');
     }
 }
 
@@ -151,7 +163,6 @@ function displayCars(cars) {
                 <p><strong>Price:</strong> $${Number(car.price).toLocaleString()}</p>
                 <p><strong>Mileage:</strong> ${Number(car.mileageKm).toLocaleString()} km</p>
                 ${car.color ? `<p><strong>Color:</strong> ${escapeHtml(car.color)}</p>` : ''}
-                ${car.imageDataUrl ? `<img src="${car.imageDataUrl}" alt="Car image" style="margin-top:10px; width:100%; max-height:180px; object-fit:cover; border-radius:8px; border:2px solid #eee;">` : ''}
             </div>
             <div class="car-actions" onclick="event.stopPropagation()">
                 <button class="btn btn-edit" onclick="window.location.href='add-car.html?id=${car.id}'">Edit</button>
@@ -161,13 +172,26 @@ function displayCars(cars) {
     `).join('');
 }
 
-function showCarPopup(id) {
+async function showCarPopup(id) {
+    const popup = document.getElementById('car-popup');
+    const body = document.getElementById('popup-body');
     const car = allCars.find(c => c.id === id);
     if (!car) return;
 
-    const popup = document.getElementById('car-popup');
-    const body = document.getElementById('popup-body');
+    body.innerHTML = '<div class="loading">Loading details...</div>';
+    popup.style.display = 'block';
 
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        if (!response.ok) throw new Error('Failed to load car details');
+        const fullCar = await response.json();
+        renderPopupContent(body, fullCar);
+    } catch (error) {
+        body.innerHTML = `<p class="error-message">${escapeHtml(error.message)}</p>`;
+    }
+}
+
+function renderPopupContent(body, car) {
     const createdDate = car.createdAt ? new Date(car.createdAt).toLocaleDateString() : 'N/A';
     const updatedDate = car.updatedAt ? new Date(car.updatedAt).toLocaleDateString() : 'N/A';
 
@@ -193,29 +217,48 @@ function showCarPopup(id) {
             <button class="btn btn-delete" onclick="deleteCarFromPopup(${car.id})">Delete Listing</button>
         </div>
     `;
-    popup.style.display = 'block';
 }
 
 async function deleteCarFromPopup(id) {
     if (!confirm('Are you sure you want to delete this car listing?')) return;
-    try {
-        const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        if (!response.ok) throw new Error('Failed to delete car');
-        document.getElementById('car-popup').style.display = 'none';
-        await loadCars();
-    } catch (error) {
-        showError('Error deleting car: ' + error.message);
-    }
+    const popup = document.getElementById('car-popup');
+    popup.style.display = 'none';
+    await performDelete(id);
 }
 
 async function deleteCar(id) {
     if (!confirm('Are you sure you want to delete this car listing?')) return;
+    await performDelete(id);
+}
+
+async function performDelete(id) {
     try {
         const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
         if (!response.ok) throw new Error('Failed to delete car');
-        await loadCars();
+
+        const idx = allCars.findIndex(c => c.id === id);
+        if (idx >= 0) {
+            allCars.splice(idx, 1);
+            const stats = await fetchStats();
+            if (stats) renderStats(stats);
+            populateFilterOptions(allCars);
+            applyFiltersAndSort();
+        } else {
+            await loadData();
+        }
     } catch (error) {
         showError('Error deleting car: ' + error.message);
+        await loadData();
+    }
+}
+
+async function fetchStats() {
+    try {
+        const res = await fetch(STATS_URL);
+        if (!res.ok) return null;
+        return await res.json();
+    } catch {
+        return null;
     }
 }
 

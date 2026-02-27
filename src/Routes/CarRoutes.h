@@ -27,7 +27,26 @@ public:
             return def;
         };
 
-        // GET all
+        // GET stats (lightweight - no image data)
+        CROW_ROUTE(app, "/api/stats").methods("GET"_method)
+        ([&db]() {
+            int total = db.getCarCount();
+            double avgPrice = db.getAvgPrice();
+            auto topModels = db.getTopModels(5);
+
+            crow::json::wvalue response;
+            response["total"] = total;
+            response["avgPrice"] = avgPrice;
+            crow::json::wvalue modelsList = crow::json::wvalue::list();
+            for (size_t i = 0; i < topModels.size(); i++) {
+                modelsList[i]["model"] = topModels[i].first;
+                modelsList[i]["count"] = topModels[i].second;
+            }
+            response["topModels"] = std::move(modelsList);
+            return crow::response(200, response);
+        });
+
+        // GET all (excludeImages=true for list views - fetch via GET /api/cars/{id} for detail)
         CROW_ROUTE(app, "/api/cars").methods("GET"_method)
         ([&db](const crow::request& req) {
             int limit = -1;
@@ -35,7 +54,7 @@ public:
             if (limitParam) {
                 try { limit = std::stoi(limitParam); } catch (...) {}
             }
-            std::vector<Car> cars = db.getAllCars(limit);
+            std::vector<Car> cars = db.getAllCars(limit, true);
             crow::json::wvalue response = crow::json::wvalue::list();
 
             for (size_t i = 0; i < cars.size(); i++) {

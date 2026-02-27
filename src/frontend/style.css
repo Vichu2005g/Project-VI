@@ -386,6 +386,7 @@ a.btn-primary, a.btn-stats {
     cursor: pointer;
     user-select: none;
     background: white;
+    contain: layout style paint;
 }
 
 .car-card:hover {

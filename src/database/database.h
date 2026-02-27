@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <utility>
 #include <vector>
 #include <sqlite3.h>
 #include "../../Models/Car.h"
@@ -18,7 +19,12 @@ public:
     bool updateCar(int id, const Car& car);
     bool deleteCar(int id);
     Car getCarById(int id, bool& found);
-    std::vector<Car> getAllCars(int limit = -1);
+    std::vector<Car> getAllCars(int limit = -1, bool excludeImages = false);
+
+    // Stats (for /api/stats - avoids loading full dataset)
+    int getCarCount();
+    double getAvgPrice();
+    std::vector<std::pair<std::string, int>> getTopModels(int limit = 5);
 
     // Utility methods
     bool carExists(int id);

@@ -26,7 +26,9 @@ target_include_directories(Project-VI PRIVATE
 )
 
 
-# Windows: Link winsock for networking
+# Platform-specific linking
 if(WIN32)
     target_link_libraries(Project-VI PRIVATE ws2_32)
+elseif(UNIX)
+    target_link_libraries(Project-VI PRIVATE pthread)
 endif()

@@ -15,8 +15,6 @@ COPY src/ ./src/
 COPY Models/ ./Models/
 COPY third_party/ ./third_party/
 COPY src/frontend/ ./frontend/
-COPY src/utils/ ./src/utils/
-COPY third_party/ ./third_party/  
 
 RUN cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && \
     cmake --build build

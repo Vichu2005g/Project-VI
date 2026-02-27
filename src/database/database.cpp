@@ -222,12 +222,12 @@ Car Database::getCarById(int id, bool& found) {
 }
 
 // Get all
-std::vector<Car> Database::getAllCars(int limit) {
+std::vector<Car> Database::getAllCars(int limit, bool excludeImages) {
     std::vector<Car> cars;
 
-    std::string sql =
-        "SELECT id, make, model, year, price, mileage_km, color, vin, image_data_url, created_at, updated_at "
-        "FROM cars ORDER BY updated_at DESC";
+    std::string sql = excludeImages
+        ? "SELECT id, make, model, year, price, mileage_km, color, vin, created_at, updated_at FROM cars ORDER BY updated_at DESC"
+        : "SELECT id, make, model, year, price, mileage_km, color, vin, image_data_url, created_at, updated_at FROM cars ORDER BY updated_at DESC";
     if (limit > 0) sql += " LIMIT " + std::to_string(limit);
     sql += ";";
 
@@ -235,6 +235,10 @@ std::vector<Car> Database::getAllCars(int limit) {
     int result = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
 
     if (result != SQLITE_OK) return cars;
+
+    const int imgCol = excludeImages ? -1 : 8;
+    const int createdCol = excludeImages ? 8 : 9;
+    const int updatedCol = excludeImages ? 9 : 10;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         Car car;
@@ -252,13 +256,16 @@ std::vector<Car> Database::getAllCars(int limit) {
 
         const unsigned char* colorTxt = sqlite3_column_text(stmt, 6);
         const unsigned char* vinTxt = sqlite3_column_text(stmt, 7);
-        const unsigned char* imgTxt = sqlite3_column_text(stmt, 8);
-        const unsigned char* createdTxt = sqlite3_column_text(stmt, 9);
-        const unsigned char* updatedTxt = sqlite3_column_text(stmt, 10);
-
         car.setColor(colorTxt ? reinterpret_cast<const char*>(colorTxt) : "");
         car.setVin(vinTxt ? reinterpret_cast<const char*>(vinTxt) : "");
-        car.setImageDataUrl(imgTxt ? reinterpret_cast<const char*>(imgTxt) : "");
+
+        if (!excludeImages) {
+            const unsigned char* imgTxt = sqlite3_column_text(stmt, 8);
+            car.setImageDataUrl(imgTxt ? reinterpret_cast<const char*>(imgTxt) : "");
+        }
+
+        const unsigned char* createdTxt = sqlite3_column_text(stmt, createdCol);
+        const unsigned char* updatedTxt = sqlite3_column_text(stmt, updatedCol);
         car.setCreatedAt(createdTxt ? reinterpret_cast<const char*>(createdTxt) : "");
         car.setUpdatedAt(updatedTxt ? reinterpret_cast<const char*>(updatedTxt) : "");
 
@@ -267,6 +274,42 @@ std::vector<Car> Database::getAllCars(int limit) {
 
     sqlite3_finalize(stmt);
     return cars;
+}
+
+// Stats
+int Database::getCarCount() {
+    std::string sql = "SELECT COUNT(*) FROM cars;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) return 0;
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) count = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+double Database::getAvgPrice() {
+    std::string sql = "SELECT AVG(price) FROM cars;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) return 0.0;
+    double avg = 0.0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) avg = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+    return avg;
+}
+
+std::vector<std::pair<std::string, int>> Database::getTopModels(int limit) {
+    std::vector<std::pair<std::string, int>> result;
+    std::string sql = "SELECT model, COUNT(*) as cnt FROM cars WHERE model IS NOT NULL AND model != '' GROUP BY model ORDER BY cnt DESC LIMIT " + std::to_string(limit > 0 ? limit : 5) + ";";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) return result;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* modelTxt = sqlite3_column_text(stmt, 0);
+        std::string model = modelTxt ? reinterpret_cast<const char*>(modelTxt) : "";
+        int cnt = sqlite3_column_int(stmt, 1);
+        result.emplace_back(model, cnt);
+    }
+    sqlite3_finalize(stmt);
+    return result;
 }
 
 bool Database::carExists(int id) {
