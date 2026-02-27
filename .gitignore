@@ -30,3 +30,8 @@ RelWithDebInfo/
 # OS junk
 .DS_Store
 Thumbs.db
+# JMeter
+Project-VI-TestPlan.jmx
+test results/
+*.jtl
+*.log
